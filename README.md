@@ -1,7 +1,4 @@
-# Volatility Pair Trading: Nifty vs Bank Nifty (IV)
-
-**Author:** Your Name  
-**Role:** Quant Research Project (True Beacon)
+Quant Research Project: Shaswat
 
 ## What’s inside
 - `zscore_base_strategy.ipynb` — Baseline rolling **z-score** strategy with parameter sweeps.  
@@ -19,13 +16,11 @@ Trading horizon targeted: **30 minutes to ~5 days**.
 
 ---
 
-## 2) Data Cleaning (assumptions kept simple & explicit)
+## 2) Data Cleaning Done
 1. **Filter trading calendar:** removed weekends; kept **09:15–15:30 IST**.  
-2. **Handle missing data:** **forward-filled** (`ffill`) — standard for market microstructure; avoids false zeros / gaps.  
+2. **Handle missing data:** **forward-filled** (`ffill`) — consistent with financial time-series practice where the last known market state is assumed to persist until new data arrives. (Dropping or filling with 0 would distort spreads and IV dynamics.)
 3. **De-dup & typing:** drop duplicate timestamps; ensure numeric types; time index sorted.  
-4. **Pandas-ready:** one tidy DataFrame: `time, banknifty, nifty, tte`.
-
-> Why ffill? In intraday IV, the last observed state is the best available placeholder until a new observation arrives; zeros would distort spreads.
+4. **Pandas-ready::** Structure as: `time, banknifty, nifty, tte`.
 
 ---
 
@@ -105,27 +100,17 @@ Weighted objective (PnL, Sharpe, Drawdown) using Optuna/TPE.
 ---
 
 ## 6) Why my enhanced models didn’t beat the base (yet)
-- **Data length**: adaptive/ML methods need longer, varied regimes to generalize.  
-- **Risk of overfit**: more parameters + few regimes = less stable out-of-sample.  
-- **Stationarity drift**: hedge/relationship can shift; z-score with robust windows often handles this surprisingly well.
 
-**Future work (fast wins):**
-- Regime segmentation (volatility states) with **per-regime thresholds**.  
-- Penalize **trade density** in objective to avoid churn.  
-- Add **transaction costs** sensitivity.  
-- Try **OU half-life** gating (enter only when mean-reversion speed is healthy).
+In theory, the enhanced approaches (ML optimization, SPSA gradient descent, coordinate descent, adaptive ML) **should have outperformed** the simple z-score strategy. They incorporate richer signals, dynamic parameter adaptation, and multi-objective scoring.  
 
----
+However, in practice, on this dataset they did **not consistently beat the base strategy**. The most likely reasons are:  
 
-## 7) How to run
-1. Install basics: `pandas`, `numpy`, `scikit-learn`, `optuna` (for ML notebook).  
-2. Open notebooks in order:
-   - `zscore_base_strategy.ipynb` → data prep + baseline grid.  
-   - `ml_enhanced_strategy.ipynb` → optimization, SPSA/coordinate descent, adaptive ML.  
-3. Replace the data path with your local `data.parquet`.
+- **Limited dataset**: more complex/ML-driven methods need a longer history with diverse market regimes to generalize well.  
+- **Parameter instability**: with fewer samples, optimized thresholds can become noisy and less robust out-of-sample.  
+- **Base model robustness**: rolling z-scores with well-chosen windows are surprisingly resilient to small sample sizes and regime drift.  
 
----
-
-## 8) License & Notes
-- Research-only; no investment advice.  
-- All results are **backtests**; past performance ≠ future returns.
+### Future Directions
+With more data or further tuning, the advanced approaches should theoretically yield stronger results. Immediate next steps could be:  
+- Adding **regime segmentation** (e.g., high vs. low volatility periods with separate thresholds).  
+- Penalizing **excessive trade density** in the optimization objective to reduce churn.  
+- Incorporating **transaction cost sensitivity** to test robustness under realistic frictions.  
