@@ -108,9 +108,11 @@ However, in practice, on this dataset they did **not consistently beat the base 
 - **Limited dataset**: more complex/ML-driven methods need a longer history with diverse market regimes to generalize well.  
 - **Parameter instability**: with fewer samples, optimized thresholds can become noisy and less robust out-of-sample.  
 - **Base model robustness**: rolling z-scores with well-chosen windows are surprisingly resilient to small sample sizes and regime drift.  
+- **Leading–lagging hypothesis not validated**: I tested the idea that **Bank Nifty IV should lead Nifty IV** (since banks account for ~20% of Nifty and ~36% including NBFCs, and the Indian economy is heavily bank-dependent). While theoretically sound, this lag/lead structure was **not visible in the limited dataset**, so the signal did not add predictive power.  
 
 ### Future Directions
 With more data or further tuning, the advanced approaches should theoretically yield stronger results. Immediate next steps could be:  
 - Adding **regime segmentation** (e.g., high vs. low volatility periods with separate thresholds).  
 - Penalizing **excessive trade density** in the optimization objective to reduce churn.  
 - Incorporating **transaction cost sensitivity** to test robustness under realistic frictions.  
+- Re-testing the **leading/lagging dynamic** with longer datasets to validate if Bank Nifty reliably acts as an early signal for Nifty volatility.  
